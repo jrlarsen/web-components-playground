@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Web Components Playground</title>
+        <style>
+            canvas {
+                border: 1px solid silver;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            class ShapesCanvas extends HTMLElement {
+                static get observedAttributes() {
+                    return ["shapes"];
+                }
+
+                constructor() {
+                    super();
+                }
+
+                connectedCallback() {
+                    const shadow = this.attachShadow({ mode: "open" });
+                    const canvas = document.createElement("canvas");
+                    shadow.appendChild(canvas);
+
+                    this.ctx = canvas.getContext("2d");
+                }
+
+                attributeChangedCallback(name, oldValue, newValue) {
+                    if (name === "shapes") {
+                        this.shapes = JSON.parse(newValue);
+                        this.draw();
+                    }
+                }
+
+                draw() {
+                    const ctx = this.ctx;
+                    if (ctx) {
+                        ctx.clearRect(0, 0, 300, 300); 
+                        const [first, ...rest] = this.shapes;
+                        ctx.beginPath();
+                        ctx.moveTo(first.x, first.y);
+                        rest.forEach(p => {
+                            ctx.lineTo(p.x, p.y);
+                        });
+                        ctx.closePath();
+                        ctx.stroke();
+                    }                    
+                }
+            }
+            customElements.define("shapes-canvas", ShapesCanvas);
+        </script>
+
+        <h1>Web Components Playground</h1>
+
+        <shapes-canvas id="shapes" shapes=[]></shapes-canvas>
+
+        <p>
+            <button id="addBtn">Add Point</button>
+            <button id="resetBtn">Reset</button>
+        </p>
+        <script>
+            const intBetween = (a, b) => Math.floor(Math.random() * (b - a)) + a;
+            let shapes = [{ x: intBetween(1, 300), y: intBetween(1, 150) }];
+            const canvas = document.getElementById("shapes");
+            canvas.setAttribute("shapes", JSON.stringify(shapes));
+
+            const addBtn = document.getElementById("addBtn");
+            addBtn.addEventListener("click", () => {
+                shapes.push({ x: intBetween(1, 300), y: intBetween(1, 150)});
+                canvas.setAttribute("shapes", JSON.stringify(shapes));
+            })
+
+            const resetBtn = document.getElementById("resetBtn");
+            resetBtn.addEventListener("click", () => {
+                shapes = [{ x: intBetween(1, 300), y: intBetween(1, 150) }]
+                canvas.setAttribute("shapes", JSON.stringify(shapes));
+            })
+        </script>
+    </body>
+</html>

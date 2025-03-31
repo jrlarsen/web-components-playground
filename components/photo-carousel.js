@@ -1,6 +1,11 @@
 class PhotoCarousel extends HTMLElement {
     connectedCallback() {
-        console.log("Photo Carousel");
+        this.innerHTML = `
+<h2>${this.getAttribute('title')}</h2>
+<h4>by ${this.getAttribute('author')}</h4>
+<div class="image-container"></div>
+<button class="back">&lt</button>
+<button class="forward">&gt</button>`;
     }
 }
 

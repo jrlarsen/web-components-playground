@@ -33,15 +33,15 @@ class MySlider extends HTMLElement {
         bg.style.backgroundColor = this.getAttribute('backgroundcolor');
 
         const th = this.querySelector('.thumb');
-        th.style.marginLeft = this.getAttribute('value') + 'px';
         th.style.width = '5px';
         th.style.height = 'calc(100% - 5px)';
         th.style.position = 'absolute';
         th.style.border = '3px solid white';
         th.style.borderRadius = '3px';
 
-        // this.setColor(this.backgroundcolor);
-        // this.refreshSlider(this.value);
+        document.addEventListener("mousedown", e => this.eventHandler(e));
+        document.addEventListener("mouseup", e => this.eventHandler(e));
+        document.addEventListener("mousemove", e => this.eventHandler(e));
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -64,12 +64,47 @@ class MySlider extends HTMLElement {
     }
 
     refreshSlider(value) {
-        if (this.querySelector('.thumb')) {
-                this.querySelector('.thumb').style.left = (value/100 *
-                this.offsetWidth - this.querySelector('.thumb').offsetWidth/2)
-                + 'px';
+        const th = this.querySelector('.thumb');
+        if (th) {
+            th.style.left = (value/100 * this.offsetWidth - th.offsetWidth/2) + 'px';
         }
     }
+
+    updateX(x) {
+        let hPos =
+        x - this.querySelector('.thumb') .offsetWidth/2;
+        if (hPos > this.offsetWidth) {
+            hPos = this.offsetWidth;
+        }
+        if (hPos < 0) {
+            hPos = 0;
+        }
+        this.value = (hPos / this.offsetWidth) * 100;
+     }
+     
+     eventHandler(e) {
+        const bounds = this.getBoundingClientRect();
+        const x = e.clientX - bounds.left;
+     
+        switch (e.type) {
+            case 'mousedown':
+                this.isDragging = true;
+                this.updateX(x);
+                this.refreshSlider(this.value);
+                break;
+     
+            case 'mouseup':
+                this.isDragging = false;
+                break;
+     
+            case 'mousemove':
+                if (this.isDragging) {
+                    this.updateX(x);
+                    this.refreshSlider(this.value);
+                }
+                break;
+        }
+     }
 }
 
 if (!customElements.get("my-slider")) {

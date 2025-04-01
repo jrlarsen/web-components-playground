@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>State Test</title>
+        <script src="components/state-emitter.js"></script>
+        <script src="components/shapes-canvas.js"></script>
+    </head>
+    <body>
+        <h1>State Emitter!</h1>
+
+        <p>
+            <button id="appendPoint">Add Point</button>
+            <button id="resetPoints">Reset</button>
+        </p>
+
+        <state-emitter />
+        <shapes-canvas />
+
+        <script>
+            const intBetween = (a, b) => Math.floor(Math.random() * (b - a)) + a;
+            const getPoint = () => ({ x: intBetween(1, 300), y: intBetween(1, 150) });
+
+            const fnList = [
+                {
+                    name: "shapes",
+                    deps: [],
+                    fn: (state) => [],
+                }
+            ];
+            const stateEmitter = document.querySelector("state-emitter");
+            stateEmitter.fnList = fnList;
+            stateEmitter.state = { shapes: [getPoint()] };
+
+            const btnAppend = document.getElementById("appendPoint");
+            btnAppend.addEventListener("click", () => {
+                stateEmitter.state = { shapes: [...stateEmitter.state.shapes, getPoint()] };
+            });
+
+            const btnReset = document.getElementById("resetPoints");
+            btnReset.addEventListener("click", () => {
+                stateEmitter.state = { shapes: [getPoint()] };
+            });
+        </script>
+    </body>
+</html>

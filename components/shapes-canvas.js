@@ -1,11 +1,5 @@
 class ShapesCanvas extends HTMLElement {
-    static get observedAttributes() {
-        return ["shapes"];
-    }
-
-    constructor() {
-        super();
-    }
+    #src;
 
     connectedCallback() {
         const shadow = this.attachShadow({ mode: "open" });
@@ -13,12 +7,19 @@ class ShapesCanvas extends HTMLElement {
         shadow.appendChild(canvas);
 
         this.ctx = canvas.getContext("2d");
+
+        this.#src = document.querySelector("state-emitter");
+        if (this.#src) {
+            this.#src.addEventListener("updated", (e) => {
+                this.shapes = e.detail.shapes;
+                this.draw();
+            });
+        }
     }
 
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (name === "shapes") {
-            this.shapes = JSON.parse(newValue);
-            this.draw();
+    disconnectedCallback() {
+        if (this.#src) {
+            this.#src.removeEventListener("updated");
         }
     }
 

@@ -1,4 +1,24 @@
 class MySlider extends HTMLElement {
+    static get observedAttributes() {
+        return ["value", "backgroundcolor"];
+    }
+
+    set value(val) {
+        this.setAttribute('value', val);
+    }
+     
+    get value() {
+        return this.getAttribute('value');
+    }
+     
+    set backgroundcolor(val) {
+        this.setAttribute('backgroundcolor', val);
+    }
+     
+    get backgroundcolor() {
+        return this.getAttribute('backgroundcolor');
+    }
+
     connectedCallback() {
         this.innerHTML = '<div class="bg-overlay"></div><div class="thumb"></div>';
         this.style.display = 'inline-block';
@@ -19,6 +39,36 @@ class MySlider extends HTMLElement {
         th.style.position = 'absolute';
         th.style.border = '3px solid white';
         th.style.borderRadius = '3px';
+
+        // this.setColor(this.backgroundcolor);
+        // this.refreshSlider(this.value);
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        switch (name) {
+            case "value":
+                this.refreshSlider(newValue);
+                break;
+
+            case "backgroundcolor":
+                this.setColor(newValue);
+                break;
+        }
+    }
+
+    setColor(color) {
+        if (this.querySelector('.bg-overlay')) {
+            this.querySelector('.bg-overlay').style.background =
+                `linear-gradient(to right, ${color} 0%, ${color}00 100%)`;
+        }
+    }
+
+    refreshSlider(value) {
+        if (this.querySelector('.thumb')) {
+                this.querySelector('.thumb').style.left = (value/100 *
+                this.offsetWidth - this.querySelector('.thumb').offsetWidth/2)
+                + 'px';
+        }
     }
 }
 

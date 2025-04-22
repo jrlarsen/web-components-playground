@@ -53,20 +53,27 @@
        e.dataTransfer.dropEffect = "move";
     }
 
-    function dropHandler(e) {
-       e.preventDefault();
-       // Get the id of the target and add the moved element to the target's DOM
-       const data = e.dataTransfer.getData("text/plain");
-       const item = document.getElementById(data);
-       e.target.appendChild(item.cloneNode(true));
+    function getDropHandler() {
+       let count = 0;
+       return function dropHandler(e) {
+          e.preventDefault();
+          // Get the id of the target and add the moved element to the target's DOM
+          const data = e.dataTransfer.getData("text/plain");
+          const item = document.getElementById(data);
+          const dropped = item.cloneNode(true);
+          dropped.addEventListener("dragstart", dragStartHandler);
+          dropped.setAttribute("id", `${item.getAttribute("id").split("_")[0]}_${count++}`);
+          e.target.appendChild(dropped);
+       }
     }
+
 
     window.addEventListener("DOMContentLoaded", () => {
        const elem = document.getElementById("p1");
        const target = document.querySelector("#target");
        elem.addEventListener("dragstart", dragStartHandler);
        target.addEventListener("dragover", dragoverHandler);
-       target.addEventListener("drop", dropHandler);
+       target.addEventListener("drop", getDropHandler());
     });
 </script>
 </body>
